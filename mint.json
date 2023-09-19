@@ -1,0 +1,51 @@
+{
+    "name": "Sohar Health",
+    "logo": {
+      "light": "/logo/light.png",
+      "dark": "/logo/dark.png"
+    },
+    "favicon": "/favicon.svg",
+    "colors": {
+      "primary": "#FFC46A",
+      "light": "#FFD595",
+      "dark": "#FFC46A"
+    },
+    "topbarCtaButton": {
+      "name": "Request a demo",
+      "url": "https://calendly.com/d/z7j-8n2-w2v/30mins-demo-with-sohar-health"
+    },
+    "api": {
+        "baseUrl": "https://api.soharhealth.com"
+    },
+    "topbarLinks": [
+      {
+        "name": "Terms",
+        "url": "https://www.soharhealth.com/terms-of-use"
+      }
+    ],
+    "navigation": [
+            {
+              "group": "Patients",
+              "pages": [
+                "api-reference/patients/create-a-patient",
+                "api-reference/patients/update-a-patients-last-active-timestamp"
+              ]
+            },
+            {
+              "group": "Verifications",
+              "pages": [
+                "api-reference/verifications/create-an-eligibility-verification-request"
+              ]
+            },
+            {
+              "group": "Payers",
+              "pages": [
+                "api-reference/payers/retrieve-a-list-of-supported-payers"
+              ]
+            }      
+    ],
+    "footerSocials":
+      {
+          "linkedin": "https://www.linkedin.com/company/sohar-health/"
+      }
+  }

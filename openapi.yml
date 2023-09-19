@@ -1,0 +1,234 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Sohar Health API
+  license:
+    name: MIT
+servers:
+  - url: https://api.soharhealth.com
+paths:
+  /v1/patients:
+    post:
+      summary: Create a patient
+      operationId: createPatient
+      tags:
+        - Patients
+      security:
+        - BasicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatientRequest'
+            example:
+              firstName: "John"
+              lastName: "Doe"
+              dateOfBirth: "01/01/1999"
+              state: "CA"
+      responses:
+        '201':
+          description: A patient ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientResponse'
+        '400':
+          description: Invalid request
+        '403':
+          description: Unauthorized
+        '500':
+          description: Internal error
+  /v1/patients/{patientId}/heartbeat:
+    put:
+      summary: Update a patient's last active timestamp
+      operationId: updatePatient
+      tags:
+        - Patients
+      security:
+        - BasicAuth: []
+      parameters:
+        - in: path
+          name: patientId
+          required: true
+          schema:
+            type: string
+          description: The patient's ID
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Invalid request
+        '403':
+          description: Unauthorized
+        '500':
+          description: Internal error
+  /v1/verifications:
+    post:
+      summary: Create an eligibility verification request
+      operationId: createVerification
+      tags:
+        - Verifications
+      security:
+        - BasicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerificationRequest'
+            example:
+              patientId: "e0e2b88e-7387-4b27-aa89-e77fcf9c049c"
+              memberId: "000000"
+              payerId: "fb701ac1-1246-4860-b1ec-bd916b97a990"
+      responses:
+        '201':
+          description: A verification ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+        '400':
+          description: Invalid request
+        '403':
+          description: Unauthorized
+        '500':
+          description: Internal error
+      callbacks:
+        webhookResponse:
+          'https://api.example.com/webhook':
+            post:
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/WebhookResponse'
+                    example:
+                      patientId: "e0e2b88e-7387-4b27-aa89-e77fcf9c049c"
+                      verificationId: "fea522b0-883a-4894-b0ed-daeb36216e51"
+                      status: "complete.eligible"
+                      coverageStartDate: "01/01/2023"
+                      coverageEndDate: "12/31/9999"
+                      cost: 123.45
+                      copay: 0
+                      coinsurance: 0.2
+                      totalDeductible: 5000
+                      remainingDeductible: 4500
+                      planName: "Open Choice Select"
+                      priorAuthRequired: true
+              responses:
+                '200':
+                  description: Success
+  /v1/payers:
+    get:
+      summary: Retrieve a list of supported payers
+      operationId: getPayers
+      tags:
+        - Payers
+      security:
+        - BasicAuth: []
+      responses:
+        '200':
+          description: A list of payers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payers'
+        '400':
+          description: Invalid request
+        '403':
+          description: Unauthorized
+        '404':
+          description: Not found
+        '500':
+          description: Internal error
+components:
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    PatientRequest:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        dateOfBirth:
+          type: string
+        state:
+          type: string
+    PatientResponse:
+      type: object
+      properties:
+        patientId:
+          type: string
+    VerificationRequest:
+      type: object
+      properties:
+        patientId:
+          type: string
+        memberId:
+          type: string
+        payerId:
+          type: string
+    VerificationResponse:
+      type: object
+      properties:
+        patientId:
+          type: string
+        verificationId:
+          type: string
+    WebhookResponse:
+      type: object
+      properties:
+        patientId:
+          type: string
+        verificationId:
+          type: string
+        status:
+          type: string
+        coverageStartDate:
+          type: string
+        coverageEndDate:
+          type: string
+        cost:
+          type: number
+        copay:
+          type: number
+        coinsurance:
+          type: number
+        totalDeductible:
+          type: number
+        remainingDeductible:
+          type: number
+        planName:
+          type: string
+        priorAuthRequired:
+          type: boolean
+    Payer:
+      type: object
+      properties:
+        payerId:
+          type: string
+        payerName:
+          type: string
+    VerificationRequests:
+      type: object
+      properties:
+        verifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/VerificationRequest'
+    VerificationResponses:
+      type: object
+      properties:
+        verifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/VerificationResponse'
+    Payers:
+      type: array
+      items:
+        $ref: '#/components/schemas/Payer'
